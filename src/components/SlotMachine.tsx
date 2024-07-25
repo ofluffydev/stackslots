@@ -1,5 +1,7 @@
-import SlotReel, {Choice} from "@/components/SlotReel";
+"use client";
 
+import {useEffect, useState} from 'react';
+import SlotReel, {Choice} from "@/components/SlotReel";
 
 const React = new Choice("React", "/react.png", "A JavaScript library for building user interfaces");
 const BoilerplateHTML = new Choice("Boilerplate HTML", "/html.png", "A simple HTML template");
@@ -23,36 +25,59 @@ const DevOpsChoices = [Docker, Kubernetes, GitHubActions];
 
 type ChoiceCategory = [string, Choice[]];
 
-const choices: ChoiceCategory[] = [
-    ["Front-end", FrontEndChoices],
-    ["Back-end", BackEndChoices],
-    ["Database", DatabaseChoices],
-    ["DevOps", DevOpsChoices]
-];
+const choices: ChoiceCategory[] = [["Front-end", FrontEndChoices], ["Back-end", BackEndChoices], ["Database", DatabaseChoices], ["DevOps", DevOpsChoices]];
 
-function spin() {
-    choices.forEach(([title, choiceArray]) => {
-        const randomIndex = Math.floor(Math.random() * choiceArray.length);
-        console.log(`${title}: ${choiceArray[randomIndex].title}`);
-    });
-}
+const SlotMachine = () => {
+    const [selections, setSelections] = useState(choices.map(() => 0));
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [spinCount, setSpinCount] = useState(0);
 
-function SlotMachine() {
-    return (
-        <div className="flex flex-col items-center gap-4">
+    useEffect(() => {
+        if (isSpinning && spinCount < 25) {
+            const timer = setTimeout(() => {
+                setSelections(choices.map(([, choiceArray]) => Math.floor(Math.random() * choiceArray.length)));
+                setSpinCount(prevCount => prevCount + 1);
+            }, 100);
+
+            return () => clearTimeout(timer);
+        } else if (spinCount >= 10) {
+            setIsSpinning(false);
+            setSpinCount(0);
+        }
+    }, [isSpinning, spinCount]);
+
+    const spin = () => {
+        setIsSpinning(true);
+    };
+
+    const updateSelection = (categoryIndex: number, newSelection: number) => {
+        setSelections(prev => {
+            const newSelections = [...prev];
+            newSelections[categoryIndex] = newSelection;
+            return newSelections;
+        });
+    };
+
+    return (<div className="flex flex-col items-center gap-4">
             <div className="flex flex-row justify-center gap-10">
-                {choices.map(([title, choiceArray], index) => (
-                    <div key={index} className="flex flex-col items-center">
+                {choices.map(([title, choiceArray], index) => (<div key={index} className="flex flex-col items-center">
                         <h3 className="text-lg font-bold mb-2">{title}</h3>
-                        <SlotReel choices={choiceArray} />
-                    </div>
-                ))}
+                        <SlotReel
+                            className="mb-4"
+                            choices={choiceArray}
+                            currentSelection={selections[index]}
+                            onSelectionChange={(newSelection) => updateSelection(index, newSelection)}
+                        />
+                    </div>))}
             </div>
-            <button onClick={spin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Spin
+            <button
+                onClick={spin}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                disabled={isSpinning}
+            >
+                {isSpinning ? 'Spinning...' : 'Spin'}
             </button>
-        </div>
-    );
-}
+        </div>);
+};
 
 export default SlotMachine;

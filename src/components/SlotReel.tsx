@@ -1,38 +1,55 @@
+import React, {useEffect, useState} from 'react';
 import Image from "next/image";
 
 export class Choice {
-    title: string;
+    name: string;
     image: string;
     description: string;
 
-    constructor(title: string, image: string, description: string) {
-        this.title = title;
+    constructor(name: string, image: string, description: string) {
+        this.name = name;
         this.image = image;
         this.description = description;
     }
 }
 
-
 interface SlotReelProps {
-    // Array of choices
-    choices: Choice[];
+    choices: Choice[],
+    currentSelection: number,
+    onSelectionChange: (newSelection: number) => void,
+    className?: string
 }
 
-function SlotReel({choices}: SlotReelProps) {
-    return <div key={choices[0].title} className="relative">
-        <h2 className="text-xl font-bold mb-4">{choices[0].title}</h2>
-        <div className="relative w-full h-64 mb-4">
-            <Image
-                src={choices[0].image}
-                alt={choices[0].title}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-lg"
-            />
+const SlotReel: React.FC<SlotReelProps> = ({choices, currentSelection, onSelectionChange, className}) => {
+    const [isSpinning, setIsSpinning] = useState(false);
+
+    useEffect(() => {
+        if (isSpinning) {
+            const spinInterval = setInterval(() => {
+                onSelectionChange((currentSelection + 1) % choices.length);
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                setIsSpinning(false);
+            }, 2000);
+
+            return () => clearInterval(spinInterval);
+        }
+    }, [isSpinning, currentSelection, choices.length, onSelectionChange]);
+
+    const handleClick = () => {
+        setIsSpinning(true);
+    };
+
+    const currentChoice = choices[currentSelection];
+
+    return (
+        <div onClick={handleClick} className={`cursor-pointer ${className}`}>
+            <Image fill src={currentChoice.image} alt={currentChoice.name} className="w-24 h-24 object-contain"/>
+            <p className="text-center mt-2">{currentChoice.name}</p>
         </div>
-        <p>{choices[0].description}</p>
-    </div>
-
-}
+    );
+};
 
 export default SlotReel;
