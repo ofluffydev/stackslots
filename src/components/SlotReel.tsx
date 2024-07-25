@@ -19,16 +19,20 @@ interface SlotReelProps {
 }
 
 function SlotReel({choices}: SlotReelProps) {
-    return (
-        <div>
-            {choices.map((choice) => (
-                <div key={choice.title}>
-                    <h2>{choice.title}</h2>
-                    <Image src={choice.image} alt={choice.title} />
-                    <p>{choice.description}</p>
-                </div>
-            ))}
+    return <div key={choices[0].title} className="relative">
+        <h2 className="text-xl font-bold mb-4">{choices[0].title}</h2>
+        <div className="relative w-full h-64 mb-4">
+            <Image
+                src={choices[0].image}
+                alt={choices[0].title}
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
+            />
         </div>
-    );
+        <p>{choices[0].description}</p>
+    </div>
+
 }
+
 export default SlotReel;

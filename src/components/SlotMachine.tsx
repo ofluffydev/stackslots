@@ -21,12 +21,38 @@ const Kubernetes = new Choice("Kubernetes", "/kubernetes.png", "An open-source p
 const GitHubActions = new Choice("GitHub Actions", "/github.png", "Automate, customize, and execute your software development workflows right in your repository");
 const DevOpsChoices = [Docker, Kubernetes, GitHubActions];
 
-const choices = [["Front-end", FrontEndChoices], ["Back-end", BackEndChoices], ["Database", DatabaseChoices], ["DevOps", DevOpsChoices]];
+type ChoiceCategory = [string, Choice[]];
+
+const choices: ChoiceCategory[] = [
+    ["Front-end", FrontEndChoices],
+    ["Back-end", BackEndChoices],
+    ["Database", DatabaseChoices],
+    ["DevOps", DevOpsChoices]
+];
+
+function spin() {
+    choices.forEach(([title, choiceArray]) => {
+        const randomIndex = Math.floor(Math.random() * choiceArray.length);
+        console.log(`${title}: ${choiceArray[randomIndex].title}`);
+    });
+}
 
 function SlotMachine() {
-    return (<div className="flex flex-row justify-center gap-10">
-
-    </div>);
+    return (
+        <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-row justify-center gap-10">
+                {choices.map(([title, choiceArray], index) => (
+                    <div key={index} className="flex flex-col items-center">
+                        <h3 className="text-lg font-bold mb-2">{title}</h3>
+                        <SlotReel choices={choiceArray} />
+                    </div>
+                ))}
+            </div>
+            <button onClick={spin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Spin
+            </button>
+        </div>
+    );
 }
 
 export default SlotMachine;
