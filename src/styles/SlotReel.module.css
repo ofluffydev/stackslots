@@ -1,0 +1,37 @@
+@keyframes spin {
+    0% {
+        /*transform: rotate(0deg);*/
+        box-shadow: 0 0 10px #ff00ff;
+    }
+    25% {
+        box-shadow: 0 0 10px #00ffff;
+    }
+    50% {
+        box-shadow: 0 0 10px #ffff00;
+    }
+    75% {
+        box-shadow: 0 0 10px #00ff00;
+    }
+    100% {
+        /*transform: rotate(360deg);*/
+        box-shadow: 0 0 10px #ff00ff;
+    }
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+/* Add a separate keyframe for color change */
+@keyframes glowChange {
+    0%, 100% { box-shadow: 0 0 10px #ff00ff; }
+    25% { box-shadow: 0 0 10px #00ffff; }
+    50% { box-shadow: 0 0 10px #ffff00; }
+    75% { box-shadow: 0 0 10px #00ff00; }
+}
+
+.spinning {
+    animation:
+            spin 1s linear infinite,
+            glowChange 2s linear infinite;
+}

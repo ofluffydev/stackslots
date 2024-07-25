@@ -1,5 +1,8 @@
-import React, {useEffect, useState} from 'react';
+"use client";
+
+import {FC, useEffect, useState} from 'react';
 import Image from "next/image";
+import styles from '../styles/SlotReel.module.css';
 
 export class Choice {
     name: string;
@@ -17,11 +20,16 @@ interface SlotReelProps {
     choices: Choice[],
     currentSelection: number,
     onSelectionChange: (newSelection: number) => void,
-    className?: string
+    className?: string,
+    isSpinning: boolean, // New prop to control spinning state
 }
 
-const SlotReel: React.FC<SlotReelProps> = ({choices, currentSelection, onSelectionChange, className}) => {
-    const [isSpinning, setIsSpinning] = useState(false);
+const SlotReel: FC<SlotReelProps> = ({choices, currentSelection, onSelectionChange, className, isSpinning}) => {
+    const [randomDelay, setRandomDelay] = useState(0);
+
+    useEffect(() => {
+        setRandomDelay(Math.random());
+    }, []);
 
     useEffect(() => {
         if (isSpinning) {
@@ -29,24 +37,23 @@ const SlotReel: React.FC<SlotReelProps> = ({choices, currentSelection, onSelecti
                 onSelectionChange((currentSelection + 1) % choices.length);
             }, 100);
 
-            setTimeout(() => {
-                clearInterval(spinInterval);
-                setIsSpinning(false);
-            }, 2000);
-
             return () => clearInterval(spinInterval);
         }
     }, [isSpinning, currentSelection, choices.length, onSelectionChange]);
 
-    const handleClick = () => {
-        setIsSpinning(true);
-    };
-
     const currentChoice = choices[currentSelection];
 
     return (
-        <div onClick={handleClick} className={`cursor-pointer ${className}`}>
-            <Image fill src={currentChoice.image} alt={currentChoice.name} className="w-24 h-24 object-contain"/>
+        <div className={`flex flex-col items-center ${className}`}>
+            <div style={{ animationDelay: `${randomDelay}s` }} className={`flex justify-center items-center w-24 h-24 relative border-neutral-500 border-4 rounded-xl bg-white p-10 ${isSpinning ? styles.spinning : ''}`}>
+                <Image
+                    fill
+                    sizes={"100px"}
+                    src={currentChoice.image}
+                    alt={currentChoice.name}
+                    className="object-contain"
+                />
+            </div>
             <p className="text-center mt-2">{currentChoice.name}</p>
         </div>
     );
